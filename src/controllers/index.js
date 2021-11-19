@@ -13,13 +13,21 @@ const {
 } = require("../services/helpers/validation");
 
 const listContacts = async (_, res) => {
-  const allContacts = await getAllContacts();
-  res.json(allContacts);
+  try {
+    const allContacts = await getAllContacts();
+    res.json(allContacts);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-const getContact = async (req, res) => {
-  const contact = await getContactById(req.params.contactId);
-  res.json(contact);
+const getContact = async (req, res, next) => {
+  try {
+    const contact = await getContactById(req.params.contactId);
+    contact ? res.json(contact) : next();
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const addContact = async (req, res) => {
@@ -27,41 +35,41 @@ const addContact = async (req, res) => {
     const isBodyValid = checkReqBody(req, res, schemaPost);
     if (!isBodyValid) return;
     const { body } = req;
-    const operation = await createContact(body);
-    res.json(operation);
+    const newContact = await createContact(body);
+    res.status(201).json(newContact);
   } catch (error) {
     console.log(error);
   }
 };
 
-const deleteContact = async (req, res) => {
+const deleteContact = async (req, res, next) => {
   try {
     const contact = await removeContactById(req.params.contactId);
-    res.json(contact);
+    contact ? res.json(contact) : next();
   } catch (error) {
     console.log(error);
   }
 };
 
-const updateContact = async (req, res) => {
+const updateContact = async (req, res, next) => {
   try {
     const isBodyValid = checkReqBody(req, res, schemaPut);
     if (!isBodyValid) return;
     const { body, params } = req;
-    const operation = await updateContactById(params.contactId, body);
-    res.json(operation);
+    const updatedContact = await updateContactById(params.contactId, body);
+    updatedContact ? res.json(updatedContact) : next();
   } catch (error) {
     console.log(error);
   }
 };
 
-const updateStatusContact = async (req, res) => {
+const updateStatusContact = async (req, res, next) => {
   try {
     const isBodyValid = checkReqBody(req, res, schemaPatchFavorite);
     if (!isBodyValid) return;
     const { body, params } = req;
-    const operation = await updateContactById(params.contactId, body);
-    res.json(operation);
+    const updatedStatus = await updateContactById(params.contactId, body);
+    updatedStatus ? res.json(updatedStatus) : next();
   } catch (error) {
     console.log(error);
   }
