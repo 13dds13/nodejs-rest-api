@@ -1,6 +1,6 @@
 const Joi = require("joi");
 
-const schemaGenegal = Joi.object({
+const schemaPost = Joi.object({
   name: Joi.string().min(5).max(30).required(),
 
   phone: Joi.string().min(5).max(30).required(),
@@ -11,9 +11,10 @@ const schemaGenegal = Joi.object({
       tlds: { allow: ["com", "net", "org", "uk"] },
     })
     .required(),
+  favorite: Joi.boolean(),
 });
 
-const schemaPatch = Joi.object({
+const schemaPut = Joi.object({
   name: Joi.string().min(5).max(30),
 
   phone: Joi.string().min(5).max(30),
@@ -22,6 +23,11 @@ const schemaPatch = Joi.object({
     minDomainSegments: 2,
     tlds: { allow: ["com", "net", "org", "uk"] },
   }),
+  favorite: Joi.boolean(),
 });
 
-module.exports = { schemaGenegal, schemaPatch };
+const schemaPatchFavorite = Joi.object({
+  favorite: Joi.boolean().required(),
+});
+
+module.exports = { schemaPost, schemaPut, schemaPatchFavorite };
