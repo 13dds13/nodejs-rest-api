@@ -4,13 +4,7 @@ const {
   createContact,
   removeContactById,
   updateContactById,
-} = require("../services/contacts");
-const { checkReqBody } = require("../services/helpers/checkReqBody");
-const {
-  schemaPatchFavorite,
-  schemaPut,
-  schemaPost,
-} = require("../services/helpers/validation");
+} = require("../services/dbService/contactsDbService");
 
 const listContacts = async (_, res) => {
   try {
@@ -32,8 +26,6 @@ const getContact = async (req, res, next) => {
 
 const addContact = async (req, res) => {
   try {
-    const isBodyValid = checkReqBody(req, res, schemaPost);
-    if (!isBodyValid) return;
     const { body } = req;
     const newContact = await createContact(body);
     res.status(201).json(newContact);
@@ -53,23 +45,9 @@ const deleteContact = async (req, res, next) => {
 
 const updateContact = async (req, res, next) => {
   try {
-    const isBodyValid = checkReqBody(req, res, schemaPut);
-    if (!isBodyValid) return;
     const { body, params } = req;
     const updatedContact = await updateContactById(params.contactId, body);
     updatedContact ? res.json(updatedContact) : next();
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const updateStatusContact = async (req, res, next) => {
-  try {
-    const isBodyValid = checkReqBody(req, res, schemaPatchFavorite);
-    if (!isBodyValid) return;
-    const { body, params } = req;
-    const updatedStatus = await updateContactById(params.contactId, body);
-    updatedStatus ? res.json(updatedStatus) : next();
   } catch (error) {
     console.log(error);
   }
@@ -81,5 +59,4 @@ module.exports = {
   addContact,
   deleteContact,
   updateContact,
-  updateStatusContact,
 };

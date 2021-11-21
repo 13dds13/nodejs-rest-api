@@ -6,7 +6,7 @@ mongoose.Promise = global.Promise;
 
 const PORT = process.env.PORT || 3000;
 
-const mongoURI = process.env.mongoURI;
+const mongoURI = process.env.MONGO_URI;
 
 const connection = mongoose.connect(mongoURI, {
   useNewUrlParser: true,
