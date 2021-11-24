@@ -1,15 +1,26 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const secretKey = process.env.SECRET;
+
 const {
   createNewUser,
   findUserByEmail,
   updateUserToken,
+  updateAvatarURL,
 } = require("../services/dbService/usersDbService");
+const mimeTypeCheck = require("../services/validation/mimeTypeCheck");
+const {
+  imgPreparetion,
+  removeTempFile,
+  createDefaultAvatar,
+} = require("../services/imgService");
 
-const usersSignup = async (req, res) => {
+const secretKey = process.env.SECRET;
+const port = process.env.PORT || 3000;
+
+const usersSignup = async ({ body }, res) => {
   try {
-    const createdNewUser = await createNewUser(req.body);
+    const avatarURL = createDefaultAvatar(body.email);
+    const createdNewUser = await createNewUser({ ...body, avatarURL });
     if (!createdNewUser) {
       res.status(409).json({ message: "Email in use" });
       return;
@@ -61,9 +72,36 @@ const getCurrentUser = async (req, res) => {
   res.json({ email, subscription });
 };
 
+const updateUsersAvatar = async (req, res) => {
+  const {
+    file: { filename, path, mimetype },
+    user,
+  } = req;
+  const currentUser = user.id;
+
+  const isImage = mimeTypeCheck(mimetype);
+  if (!isImage) {
+    res.status(406).json({ message: "Only picture files allowed" });
+    removeTempFile(path);
+    return;
+  }
+  res.json({ msg: "Successfully uploaded" });
+
+  imgPreparetion(path, filename);
+  removeTempFile(path);
+
+  try {
+    const newAvatarUrl = `http://localhost:${port}/avatars/${filename}`;
+    await updateAvatarURL(currentUser, newAvatarUrl);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   usersSignup,
   usersLogin,
   usersLogout,
   getCurrentUser,
+  updateUsersAvatar,
 };

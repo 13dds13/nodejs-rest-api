@@ -33,7 +33,6 @@ const checkContactsReqBody = (req, res, next) => {
     return;
   }
   res.status(400).json({ message: error.message });
-  return;
 };
 
 const checkUsersReqBody = (req, res, next) => {
@@ -43,7 +42,6 @@ const checkUsersReqBody = (req, res, next) => {
     return;
   }
   res.status(400).json({ message: error.message });
-  return;
 };
 
 module.exports = { checkContactsReqBody, checkUsersReqBody };

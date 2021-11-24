@@ -43,9 +43,24 @@ const findUserById = async (id) => {
   }
 };
 
+const updateAvatarURL = async (id, avatarURL) => {
+  try {
+    await User.findByIdAndUpdate(
+      id,
+      { avatarURL },
+      {
+        new: true,
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   createNewUser,
   findUserByEmail,
   updateUserToken,
   findUserById,
+  updateAvatarURL,
 };
