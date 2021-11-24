@@ -12,7 +12,7 @@ const getAllContacts = async () => {
 const getContactById = async (id) => {
   try {
     const data = await Contact.findById(id);
-    return data ? data : false;
+    return data || false;
   } catch (error) {
     console.log(error);
   }
