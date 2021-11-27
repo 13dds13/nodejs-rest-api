@@ -14,7 +14,6 @@ const authCheck = require("../middlewares/authCheck");
 const { checkUsersReqBody } = require("../middlewares/checkReqBody");
 const storage = require("../../config/multerStorage");
 const verifyCheck = require("../middlewares/verifyCheck");
-
 const router = express.Router();
 const upload = multer({ storage: storage });
 
