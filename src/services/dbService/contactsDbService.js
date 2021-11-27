@@ -1,8 +1,21 @@
 const Contact = require("../../models/contacts");
 
-const getAllContacts = async () => {
+const getAllContacts = async (page, limit) => {
   try {
-    const contactsList = await Contact.find();
+    const contactsList = await Contact.find()
+      .limit(limit)
+      .skip(page * limit);
+    return contactsList;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getAllFavoriteContacts = async (page, limit) => {
+  try {
+    const contactsList = await Contact.find({ favorite: true })
+      .limit(limit)
+      .skip(page * limit);
     return contactsList;
   } catch (error) {
     console.log(error);
@@ -53,4 +66,5 @@ module.exports = {
   createContact,
   removeContactById,
   updateContactById,
+  getAllFavoriteContacts,
 };

@@ -66,6 +66,20 @@ const updateAvatarURL = async (id, avatarURL) => {
   }
 };
 
+const updateUsersSubscriptionById = async (id, subscription) => {
+  try {
+    await User.findByIdAndUpdate(
+      id,
+      { subscription },
+      {
+        new: true,
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const makeUserVerified = async (user) => {
   try {
     const dataToUpdate = { verify: true, verifyToken: null };
@@ -89,4 +103,5 @@ module.exports = {
   findUserById,
   updateAvatarURL,
   makeUserVerified,
+  updateUsersSubscriptionById,
 };

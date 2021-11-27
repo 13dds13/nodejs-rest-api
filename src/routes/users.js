@@ -9,6 +9,7 @@ const {
   updateUsersAvatar,
   usersEmailVerification,
   repeatEmailVerification,
+  updateUsersSubscription,
 } = require("../controllers/users");
 const authCheck = require("../middlewares/authCheck");
 const { checkUsersReqBody } = require("../middlewares/checkReqBody");
@@ -23,6 +24,7 @@ router.post("/verify", repeatEmailVerification);
 router.post("/login", verifyCheck, checkUsersReqBody, usersLogin);
 router.post("/logout", authCheck, usersLogout);
 router.get("/current", authCheck, getCurrentUser);
+router.patch("/", authCheck, checkUsersReqBody, updateUsersSubscription);
 router.patch("/avatars", authCheck, upload.single("avatar"), updateUsersAvatar);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const { findUserByEmail } = require("../services/dbService/usersDbService");
 
-module.exports = (req, res, next) => {
-  const user = findUserByEmail(req.body.email);
+module.exports = async (req, res, next) => {
+  const user = await findUserByEmail(req.body.email);
   if (user.verify) {
     next();
     return;

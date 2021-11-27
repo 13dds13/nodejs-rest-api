@@ -4,11 +4,19 @@ const {
   createContact,
   removeContactById,
   updateContactById,
+  getAllFavoriteContacts,
 } = require("../services/dbService/contactsDbService");
 
-const listContacts = async (_, res) => {
+const listContacts = async (req, res) => {
   try {
-    const allContacts = await getAllContacts();
+    const { page = 0, limit = 5 } = req.query;
+    console.log(req.query);
+    if (req.query.favorite) {
+      const favoriteContacts = await getAllFavoriteContacts(+page, +limit);
+      res.json(favoriteContacts);
+      return;
+    }
+    const allContacts = await getAllContacts(+page, +limit);
     res.json(allContacts);
   } catch (error) {
     console.log(error);

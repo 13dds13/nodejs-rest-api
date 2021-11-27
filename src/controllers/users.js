@@ -9,6 +9,7 @@ const {
   findUserByEmail,
   updateUserToken,
   updateAvatarURL,
+  updateUsersSubscriptionById,
 } = require("../services/dbService/usersDbService");
 const mimeTypeCheck = require("../services/validation/mimeTypeCheck");
 const {
@@ -150,6 +151,14 @@ const updateUsersAvatar = async (req, res) => {
   }
 };
 
+const updateUsersSubscription = async (req, res, next) => {
+  try {
+    const { user, body } = req;
+    await updateUsersSubscriptionById(user.id, body.subscription);
+    res.json({ message: "Subscription successfully updated" });
+  } catch (error) {}
+};
+
 module.exports = {
   usersSignup,
   usersLogin,
@@ -158,4 +167,5 @@ module.exports = {
   updateUsersAvatar,
   usersEmailVerification,
   repeatEmailVerification,
+  updateUsersSubscription,
 };
