@@ -1,8 +1,8 @@
 const Contact = require("../../models/contacts");
 
-const getAllContacts = async (page, limit) => {
+const getAllContacts = async (page, limit, userId) => {
   try {
-    const contactsList = await Contact.find()
+    const contactsList = await Contact.find({ owner: userId })
       .limit(limit)
       .skip(page * limit);
     return contactsList;
@@ -11,9 +11,9 @@ const getAllContacts = async (page, limit) => {
   }
 };
 
-const getAllFavoriteContacts = async (page, limit) => {
+const getAllFavoriteContacts = async (page, limit, userId) => {
   try {
-    const contactsList = await Contact.find({ favorite: true })
+    const contactsList = await Contact.find({ favorite: true, owner: userId })
       .limit(limit)
       .skip(page * limit);
     return contactsList;
