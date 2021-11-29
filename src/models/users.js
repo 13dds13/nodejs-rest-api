@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-// const salt = process.env.SECRET;
 
 const user = new mongoose.Schema({
   password: {
@@ -20,6 +19,14 @@ const user = new mongoose.Schema({
   token: {
     type: String,
     default: null,
+  },
+  verify: {
+    type: Boolean,
+    default: false,
+  },
+  verifyToken: {
+    type: String,
+    required: [true, "Verify token is required"],
   },
   avatarURL: String,
 });

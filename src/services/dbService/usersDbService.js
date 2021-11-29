@@ -11,6 +11,15 @@ const createNewUser = async (data) => {
   }
 };
 
+const findUserByVerifyToken = async (verifyToken) => {
+  try {
+    const user = await User.findOne({ verifyToken });
+    return user;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const findUserByEmail = async (email) => {
   try {
     const user = await User.findOne({ email });
@@ -57,10 +66,42 @@ const updateAvatarURL = async (id, avatarURL) => {
   }
 };
 
+const updateUsersSubscriptionById = async (id, subscription) => {
+  try {
+    await User.findByIdAndUpdate(
+      id,
+      { subscription },
+      {
+        new: true,
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const makeUserVerified = async (user) => {
+  try {
+    const dataToUpdate = { verify: true, verifyToken: null };
+    await User.findByIdAndUpdate(
+      user.id,
+      { ...dataToUpdate },
+      {
+        new: true,
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   createNewUser,
+  findUserByVerifyToken,
   findUserByEmail,
   updateUserToken,
   findUserById,
   updateAvatarURL,
+  makeUserVerified,
+  updateUsersSubscriptionById,
 };

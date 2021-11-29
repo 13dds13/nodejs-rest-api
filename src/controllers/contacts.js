@@ -4,11 +4,25 @@ const {
   createContact,
   removeContactById,
   updateContactById,
+  getAllFavoriteContacts,
 } = require("../services/dbService/contactsDbService");
 
-const listContacts = async (_, res) => {
+const listContacts = async (req, res) => {
   try {
-    const allContacts = await getAllContacts();
+    const {
+      query: { page = 0, limit = 5, favorite },
+      user,
+    } = req;
+    if (favorite) {
+      const favoriteContacts = await getAllFavoriteContacts(
+        +page,
+        +limit,
+        user._id
+      );
+      res.json(favoriteContacts);
+      return;
+    }
+    const allContacts = await getAllContacts(+page, +limit, user._id);
     res.json(allContacts);
   } catch (error) {
     console.log(error);
@@ -26,8 +40,8 @@ const getContact = async (req, res, next) => {
 
 const addContact = async (req, res) => {
   try {
-    const { body } = req;
-    const newContact = await createContact(body);
+    const { body, user } = req;
+    const newContact = await createContact({ ...body, owner: user.id });
     res.status(201).json(newContact);
   } catch (error) {
     console.log(error);

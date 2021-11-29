@@ -1,11 +1,15 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const { v4: uuid } = require("uuid");
 
 const {
   createNewUser,
+  findUserByVerifyToken,
+  makeUserVerified,
   findUserByEmail,
   updateUserToken,
   updateAvatarURL,
+  updateUsersSubscriptionById,
 } = require("../services/dbService/usersDbService");
 const mimeTypeCheck = require("../services/validation/mimeTypeCheck");
 const {
@@ -13,6 +17,7 @@ const {
   removeTempFile,
   createDefaultAvatar,
 } = require("../services/imgService");
+const { createMsg, sendVerifyLetter } = require("../../config/sgMail");
 
 const secretKey = process.env.SECRET;
 const port = process.env.PORT || 3000;
@@ -20,15 +25,63 @@ const port = process.env.PORT || 3000;
 const usersSignup = async ({ body }, res) => {
   try {
     const avatarURL = createDefaultAvatar(body.email);
-    const createdNewUser = await createNewUser({ ...body, avatarURL });
+    const verifyToken = uuid();
+    const newUserData = {
+      ...body,
+      avatarURL,
+      verifyToken,
+    };
+    const createdNewUser = await createNewUser(newUserData);
     if (!createdNewUser) {
       res.status(409).json({ message: "Email in use" });
       return;
     }
     const { email, subscription } = createdNewUser;
+    const msg = createMsg(email, verifyToken);
+    await sendVerifyLetter(msg);
     res.status(201).json({
       user: { email, subscription },
     });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const usersEmailVerification = async (req, res, next) => {
+  const { verificationToken } = req.params;
+  try {
+    const user = await findUserByVerifyToken(verificationToken);
+    if (!user) {
+      next();
+      return;
+    }
+    await makeUserVerified(user);
+    res.json({ message: "Verification successful" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const repeatEmailVerification = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    res.status(400).json({ message: "Missing required field email" });
+    return;
+  }
+  try {
+    const user = await findUserByEmail(email);
+    if (!user) {
+      res
+        .status(400)
+        .json({ message: `User with email: ${email} doesn't exist` });
+      return;
+    }
+    if (user.verify) {
+      res.status(400).json({ message: "Verification has been already passed" });
+    }
+    const msg = createMsg(email, user.verifyToken);
+    await sendVerifyLetter(msg);
+    res.json({ message: "Check Your email box for new letter" });
   } catch (error) {
     console.log(error);
   }
@@ -85,7 +138,7 @@ const updateUsersAvatar = async (req, res) => {
     removeTempFile(path);
     return;
   }
-  res.json({ msg: "Successfully uploaded" });
+  res.json({ message: "Successfully uploaded" });
 
   imgPreparetion(path, filename);
   removeTempFile(path);
@@ -98,10 +151,21 @@ const updateUsersAvatar = async (req, res) => {
   }
 };
 
+const updateUsersSubscription = async (req, res, next) => {
+  try {
+    const { user, body } = req;
+    await updateUsersSubscriptionById(user.id, body.subscription);
+    res.json({ message: "Subscription successfully updated" });
+  } catch (error) {}
+};
+
 module.exports = {
   usersSignup,
   usersLogin,
   usersLogout,
   getCurrentUser,
   updateUsersAvatar,
+  usersEmailVerification,
+  repeatEmailVerification,
+  updateUsersSubscription,
 };

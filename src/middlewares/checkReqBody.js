@@ -3,7 +3,10 @@ const {
   schemaPatchFavorite,
   schemaPut,
 } = require("../services/validation/contactsValidation");
-const { schemaAuth } = require("../services/validation/usersValidation");
+const {
+  schemaAuth,
+  schemaUsersSubscriptionUpdate,
+} = require("../services/validation/usersValidation");
 
 const checkContactsReqBody = (req, res, next) => {
   const { method, body } = req;
@@ -36,6 +39,15 @@ const checkContactsReqBody = (req, res, next) => {
 };
 
 const checkUsersReqBody = (req, res, next) => {
+  if (req.method === "PATCH") {
+    const { error } = schemaUsersSubscriptionUpdate.validate(req.body);
+    if (!error) {
+      next();
+      return;
+    }
+    res.status(400).json({ message: error.message });
+    return;
+  }
   const { error } = schemaAuth.validate(req.body);
   if (!error) {
     next();

@@ -11,4 +11,8 @@ const schemaAuth = Joi.object({
   password: Joi.string().min(6).max(12).required(),
 });
 
-module.exports = { schemaAuth };
+const schemaUsersSubscriptionUpdate = Joi.object().keys({
+  subscription: Joi.string().valid("starter", "pro", "business"),
+});
+
+module.exports = { schemaAuth, schemaUsersSubscriptionUpdate };

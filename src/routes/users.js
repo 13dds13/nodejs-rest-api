@@ -7,18 +7,24 @@ const {
   usersLogout,
   getCurrentUser,
   updateUsersAvatar,
+  usersEmailVerification,
+  repeatEmailVerification,
+  updateUsersSubscription,
 } = require("../controllers/users");
 const authCheck = require("../middlewares/authCheck");
 const { checkUsersReqBody } = require("../middlewares/checkReqBody");
 const storage = require("../../config/multerStorage");
-
+const verifyCheck = require("../middlewares/verifyCheck");
 const router = express.Router();
 const upload = multer({ storage: storage });
 
 router.post("/signup", checkUsersReqBody, usersSignup);
-router.post("/login", checkUsersReqBody, usersLogin);
+router.get("/verify/:verificationToken", usersEmailVerification);
+router.post("/verify", repeatEmailVerification);
+router.post("/login", verifyCheck, checkUsersReqBody, usersLogin);
 router.post("/logout", authCheck, usersLogout);
 router.get("/current", authCheck, getCurrentUser);
+router.patch("/", authCheck, checkUsersReqBody, updateUsersSubscription);
 router.patch("/avatars", authCheck, upload.single("avatar"), updateUsersAvatar);
 
 module.exports = router;
