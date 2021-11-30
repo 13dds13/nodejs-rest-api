@@ -3,13 +3,14 @@ require("dotenv").config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const fromEmail = process.env.SENDGRID_VERIFIED_EMAIL;
+const host = process.env.HOST;
 const port = process.env.PORT;
 
 const createMsg = (email, verificationToken) => ({
   to: email,
   from: fromEmail,
   subject: "Please verify your email",
-  text: `Follow this link for Your verification: http://localhost:${port}/api/users/verify/${verificationToken}`,
+  text: `Follow this link for Your verification: ${host}:${port}/api/users/verify/${verificationToken}`,
 });
 
 const sendVerifyLetter = async (msg) => {
